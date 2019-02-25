@@ -40,27 +40,29 @@ In today's lab.  I want everybody to work separately.  You can ask each other qu
 
 Below are a few SQL statements and their structure.  Any expression enclosed in angle-brackets is **meant to be replaced** (including the angle brackets themselves).
 
-```
-	UPDATE <table> SET <field>="<value>" WHERE <condition>;
-	INSERT INTO <table> (<col list>) VALUES (<value list>);
-	DELETE FROM <table> WHERE <condition>;
+```sql
+  UPDATE <table> SET <field>="<value>" WHERE <condition>;
+  INSERT INTO <table> (<col list>) VALUES (<value list>);
+  DELETE FROM <table> WHERE <condition>;
 ```
 
 The [references](#references) section contains a link to *exhaustive* information about the 1999 SQL standard (not all of which works with MariaDB).  Also the quotes on `UPDATE` are only needed when the value is a string.
 
 Here are a few more SQL commands:
 
-```
-	CREATE TABLE <name> (<column definitions) <options>;
-	DROP TABLE <name;
-	TRUNCATE TABLE <table>; 
+```sql
+  CREATE TABLE <name> (<column definitions) <options>;
+  DROP TABLE <name;
+  TRUNCATE TABLE <table>; 
 ```
 
 The `TRUNCATE TABLE` command will remove all the data in a table without changing its structure (this is **very** useful)
 
 SQL commands are broken into **clauses**.  For example, the command
 
-```UPDATE inventory SET unit=NULL WHERE unit="patty";``` 
+```sql
+UPDATE inventory SET unit=NULL WHERE unit="patty";
+``` 
 
 has  a `SET` clause and a `WHERE` clause.  This will make a lot more sense after you work through the examples provided below.  It is important to note that the **order** of the clauses is important and many SQL statements will **fail** if the clauses appear in the wrong order.
 
@@ -103,7 +105,7 @@ Our eventual goal is to make a *point of sales* system, so we are going to start
   
 I want you to use the following description for the `id` field:
 
-```
+```sql
 id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL
 ```
 
@@ -126,17 +128,17 @@ Insert 5 or 6 items of varying amounts and values into `inventory`.  You'll want
 #### Basic form of `SELECT`
 The basic form of the `SELECT` command is `SELECT <cols> FROM <table>;`.  Experiment with that.  For example:
 
-```
-		SELECT item,unit FROM inventory;
-		SELECT unit FROM inventory;
-		SELECT unit, unit, item FROM inventory;
+```sql
+    SELECT item,unit FROM inventory;
+    SELECT unit FROM inventory;
+    SELECT unit, unit, item FROM inventory;
 ```
 
 The `*` option will show **all** columns/fields:
 
-```
-		SELECT *  FROM inventory;
-		SELECT *, item FROM inventory;
+```sql
+    SELECT *  FROM inventory;
+    SELECT *, item FROM inventory;
 ```
 
 Notice that it is perfectly ok to repeat a column in the `SELECT` statement, and that you control the order of the columns (unless you use `*`).
@@ -144,9 +146,9 @@ Notice that it is perfectly ok to repeat a column in the `SELECT` statement, and
 #### Renaming a column
 You can rename a column using the `AS <new name>` clause (note the use of quotes and the absence of quotes):
 
-```
-		SELECT item AS 'mega stuff' FROM inventory;
-		SELECT item AS stuff, amount, unit AS 'counting thing' FROM inventory;
+```sql
+    SELECT item AS 'mega stuff' FROM inventory;
+    SELECT item AS stuff, amount, unit AS 'counting thing' FROM inventory;
 ```
 
 #### Getting fancy with columns
@@ -171,25 +173,25 @@ It might not be clear from the documentation (unless you look very closely), but
 
 The functions can be used in column lists and can use columns as arguments:
 
-```
+```sql
 SELECT left(item,3) AS leftiest FROM inventory;
 ```
 
 You can combine this with the * option to add your column (but be careful, I'm pretty sure that `*` has to come first):
 
-```
+```sql
 SELECT *, left(item,3) AS leftiest FROM inventory;
 ```
 
 You do not, however, have to use columns as arguments:
 
-```
+```sql
 SELECT "peanut butter jelly" AS time, item, unit FROM inventory; 
 ```
 
 If you leave out the new column name then the column will be named after the expression:
 
-```
+```sql
 SELECT left(item,3) AS leftiest FROM inventory; 
 SELECT left(item,3) FROM inventory; 
 ```
@@ -198,43 +200,43 @@ SELECT left(item,3) FROM inventory;
 
 The `WHERE` clause acts as a filter.  It only displays rows that meet the criterion:
 
-```
+```sql
 SELECT * FROM inventory WHERE amount < 50;
 ```
 
 Think of the condition as being applied to each row one at a time and only when a TRUE is returned is that row allowed into the output.  This will return all rows that contain an n:
 
-```
+```sql
 SELECT * FROM inventory WHERE item REGEXP 'n';
 ```
 
 OR
 
-```
+```sql
 SELECT * FROM inventory WHERE item RLIKE "n";
 ```
 
 Note.  It's not case sensitive.
-	
+  
 If I wanted all rows where item STARTED with n:
 
-```
+```sql
 SELECT * FROM inventory WHERE item REGEXP '^n';
 ```
 
 OR:
 
-```
+```sql
 SELECT * FROM inventory WHERE item LIKE "n%";
-```	
+``` 
 
 Remember this was originally designed for business, so there is a "sort-of" approximate match called `SOUNDS LIKE` which takes the English pronunciation into consideration.
-	
+  
 For example, I have nacho cheese as one of my items, and this query (the results of a select statement) works to find them:
 
-```
+```sql
 SELECT * FROM inventory WHERE item SOUNDS LIKE "nawch";
-```		
+```   
 
 #### Logicals in the `WHERE` clause
 Although our sample table is still pretty small see if you can do a search for everything whose name contains a particular letter and has an amount less than 50 (refer to the first link above if necessary)
@@ -243,7 +245,7 @@ Although our sample table is still pretty small see if you can do a search for e
 
 Add `LIMIT <num>` at the end of a select to control the max number of rows:
 
-```
+```sql
 SELECT * FROM inventory LIMIT 3;
 ```
 
@@ -253,7 +255,7 @@ This is particularly useful when you are first crafting a query because it can b
 
 The `SELECT` command has a keyword called `DISTINCT`.  Placement is important-- it has to be immediately after SELECT.  Give it a try:
 
-```
+```sql
 SELECT DISTINCT item FROM inventory;
 SELECT DISTINCT id FROM inventory;
 ```
@@ -274,171 +276,171 @@ ProTip:  In an `INSERT` you can leave out the initial parenthetical clause that 
 
 ```
 mysql> describe prices;
-	+-------+--------------+------+-----+---------+-------+
-	| Field | Type         | Null | Key | Default | Extra |
-	+-------+--------------+------+-----+---------+-------+
-	| id    | int(11)      | NO   |     | NULL    |       |
-	| price | decimal(5,2) | YES  |     | NULL    |       |
-	| notes | text         | YES  |     | NULL    |       |
-	+-------+--------------+------+-----+---------+-------+
-	3 rows in set (0.00 sec)
+  +-------+--------------+------+-----+---------+-------+
+  | Field | Type         | Null | Key | Default | Extra |
+  +-------+--------------+------+-----+---------+-------+
+  | id    | int(11)      | NO   |     | NULL    |       |
+  | price | decimal(5,2) | YES  |     | NULL    |       |
+  | notes | text         | YES  |     | NULL    |       |
+  +-------+--------------+------+-----+---------+-------+
+  3 rows in set (0.00 sec)
 ```
 
 And here's an `INSERT` into that table:
 
-```
+```sql
 INSERT INTO prices VALUES (1,12.43,"Buy from Ritchie");
 ```
 
 Here's what mine looked like (your mileage may vary):
 
 ```
-	mysql> select * from prices;
-	+-----+--------+------------------+
-	| id  | price  | notes            |
-	+-----+--------+------------------+
-	|   1 |  12.43 | Buy from Ritchie |
-	|   2 | 100.19 | Versoin A        |
-	|   3 | 200.19 | Premium          |
-	| 100 |  19.18 | Chicken Flavored |
-	+-----+--------+------------------+
-	4 rows in set (0.00 sec)
+  mysql> select * from prices;
+  +-----+--------+------------------+
+  | id  | price  | notes            |
+  +-----+--------+------------------+
+  |   1 |  12.43 | Buy from Ritchie |
+  |   2 | 100.19 | Versoin A        |
+  |   3 | 200.19 | Premium          |
+  | 100 |  19.18 | Chicken Flavored |
+  +-----+--------+------------------+
+  4 rows in set (0.00 sec)
 
 ```
 
 Oh... wait.... it looks as if I made a mistake.  Let's fix `Versoin A` and change it to the proper `Version A`:
 
-```
+```sql
 UPDATE prices SET notes="Version A" WHERE id=2;
 ```
 
-(be careful-- you can accidently change ALL the values in a particular field if you are not careful.		
+(be careful-- you can accidently change ALL the values in a particular field if you are not careful.    
 
 So, back to it:
 
 ```
-	mysql> select * from prices;
-	+-----+--------+------------------+
-	| id  | price  | notes            |
-	+-----+--------+------------------+
-	|   1 |  12.43 | Buy from Ritchie |
-	|   2 | 100.19 | Version A        |
-	|   3 | 200.19 | Premium          |
-	| 100 |  19.18 | Chicken Flavored |
-	+-----+--------+------------------+
-	4 rows in set (0.00 sec)
-			
-	mysql> select * from inventory;
-	+---------------+---------+--------+----+
-	| item          | unit    | amount | id |
-	+---------------+---------+--------+----+
-	| Buffalo chips | patty   |   1200 |  1 |
-	| nacho cheese  | gallons |    100 |  2 |
-	| nacho cheese  | gallons |     20 |  3 |
-	| popcorn       | gallons |      5 |  4 |
-	| hot dogs      | units   |    120 |  5 |
-	| buns          | units   |      3 |  6 |
-	+---------------+---------+--------+----+
-	6 rows in set (0.00 sec)
+  mysql> select * from prices;
+  +-----+--------+------------------+
+  | id  | price  | notes            |
+  +-----+--------+------------------+
+  |   1 |  12.43 | Buy from Ritchie |
+  |   2 | 100.19 | Version A        |
+  |   3 | 200.19 | Premium          |
+  | 100 |  19.18 | Chicken Flavored |
+  +-----+--------+------------------+
+  4 rows in set (0.00 sec)
+      
+  mysql> select * from inventory;
+  +---------------+---------+--------+----+
+  | item          | unit    | amount | id |
+  +---------------+---------+--------+----+
+  | Buffalo chips | patty   |   1200 |  1 |
+  | nacho cheese  | gallons |    100 |  2 |
+  | nacho cheese  | gallons |     20 |  3 |
+  | popcorn       | gallons |      5 |  4 |
+  | hot dogs      | units   |    120 |  5 |
+  | buns          | units   |      3 |  6 |
+  +---------------+---------+--------+----+
+  6 rows in set (0.00 sec)
 ```
 
 The important thing is that both tables have entries not found in the other and that neither table has too many entries (if the product of the number of rows on the two tables is too large then this next step is going to be unpleasant).
-		
+    
 So... it's go time!  Give this a shot:
 
-```
+```sql
 SELECT * FROM inventory,prices;
 ```
 
 To verify that the order of tables in the FROM clause matter try this:
 
-```
+```sql
 SELECT * FROM prices,inventory;
 ```
 
 Now try this one:
 
-```
+```sql
 SELECT * FROM inventory, inventory;
 ```
 
 That one should give an error.... but this one won't:
 
-```
+```sql
 SELECT * FROM inventory, inventory AS b;
 ```
 
 The key is that you have given the second table an alias (more on this soon).   Type this one again:
 
-```
+```sql
 SELECT * FROM inventory, prices;
 ```
 
 Be sure to look carefully at the `item` column.  Now try this:
 
-```
+```sql
 SELECT item FROM inventory, prices;
 ```
 
 and try this:
 
-```
+```sql
 SELECT item,amount FROM inventory, prices;
 ```
 
 I hope it's clear what's happening.  The `SELECT *` statement with TWO tables takes every row in the first table, and every row in the second table and concatenates them together into a bigger row in every possible combination.  (Math people: this is an example of a Cartesian Product).
-		
+    
 If the first table has 10 rows, and the second table has 3 rows, then the JOIN (that's a technical term) has 30 rows.  
-		
+    
 There ARE a few limitations in select columns... Try this:
 
-```
+```sql
 SELECT id FROM inventory, prices;
 ```
 
 Notice the  problem is the ambiguity.  Fix it like this:
 
-```
+```sql
 SELECT inventory.id FROM inventory,prices;
 ```
 
 and 
 
-```
+```sql
 SELECT prices.id FROM inventory,prices;
 ```
 
 Notice that the values are different (although there are still the same number of entries.) On the other hand these two queries:
 
-```
+```sql
 SELECT inventory.id FROM inventory,prices;
 SELECT inventory.id FROM prices,inventory;
 ```
 
 (at least in my case) gives the same results... this actually surprises me, and I am pretty certain it has to do with MariaDB's attempt to optimize queries (another name for the output from a `SELECT` statement).
-		
+    
 That still doesn't help us fix
 
-```
+```sql
 SELECT id FROM inventory, inventory as B;
 ```
 
 or does it?  Try this:
 
-```
+```sql
 SELECT B.id FROM inventory, inventory as B;
 ```
 
 Or this:
 
-```
+```sql
 SELECT bob.id  FROM inventory AS bob, inventory as doug;
 SELECT doug.id  FROM inventory AS bob, inventory as doug;
-```		
+```   
 
 And now you are ready... try this:
 
-```
+```sql
 SELECT * FROM inventory, prices WHERE inventory.id=prices.id;
 ```
 
@@ -446,23 +448,23 @@ See the power?  You can bind these tables together in a way that allows you to e
   
 There are other ways to do the same thing:
 
-```
+```sql
 SELECT * FROM inventory 
 INNER JOIN prices ON inventory.id=prices.id;
 ```
 
 or
 
-```
+```sql
 SELECT * FROM inventory 
 CROSS JOIN prices ON inventory.id=prices.id;
 ```
 
 Notice that before we used the WHERE clause to control which rows to include, now we're using the ON clause in collaboration with the INNER JOIN or CROSS JOIN (they're synonyms) commands.  Functionally this works the same.
-		
+    
 What happens if want to link the tables on the id field, but still want to include data from inventory when there isn't a matching ID value in prices?  Try these (pay careful attention to where the NULL's occur):
 
-```
+```sql
 SELECT * FROM inventory LEFT JOIN prices ON inventory.id=prices.id;
 SELECT * FROM inventory RIGHT JOIN prices ON inventory.id=prices.id;
 SELECT * FROM prices LEFT JOIN inventory ON inventory.id=prices.id;
@@ -471,12 +473,12 @@ SELECT * FROM prices RIGHT JOIN inventory ON inventory.id=prices.id;
 
 You can use this technique when combined with a `WHERE` clause to find rows that have a value in one table, but not a corresponding one  in  the other:
 
-```
+```sql
 SELECT * FROM inventory LEFT JOIN prices ON inventory.id=prices.id where prices.id IS NULL;
 ```
 
 Of course, every  `LEFT JOIN` has an equivalent `RIGHT JOIN`.
-		
+    
 There is also (theoretically), an `OUTER JOIN` which, effectively is a combination of the `LEFT JOIN` and the `RIGHT JOIN` (in the way you would expect), however, MariaDB doesn't seem to implement it correctly. [Method 2 in "How to Simulate FULL OUTER JOIN in MySQL"](https://www.xaprb.com/blog/2006/05/26/how-to-write-full-outer-join-in-mysql/) does appear to work if you want to explore that.
 
 Before continuing **read [this explanation of SQL joins](http://www.codinghorror.com/blog/2007/10/a-visual-explanation-of-sql-joins.html). Be sure to do as many of the examples as you can – in particular create the tables and run the queries.** Remember that mariaDB doesn't do `FULL OUTER JOINS` correctly so you'd have to use something like the techniques in "How to simulate FULL OUTER JOIN in MySQL" mentioned above to get those examples to work. Your output may not always be in the same order either; in general because we think of query results as _sets_ the order isn't guaranteed unless you do something to explicitly specify the desired order. (More about that later.)
@@ -484,7 +486,7 @@ Before continuing **read [this explanation of SQL joins](http://www.codinghorror
 #### The `EXPLAIN` keyword
 By putting the keyword `EXPLAIN` (or `DESCRIBE`-- they're synonyms) in front of a query you get back a table that tells you something about how mariaDB is attempting to optimize your query:
 
-```
+```sql
 EXPLAIN SELECT * FROM inventory;
 EXPLAIN SELECT * FROM prices;
 EXPLAIN SELECT *,"bob" AS yeti FROM prices;
